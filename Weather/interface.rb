@@ -1,32 +1,30 @@
+# frozen_string_literal: true
+
 require "date"
 require "byebug"
 
 module Interface
-  def self.get_city
-    print "Enter the name of the city:"
-    STDIN.gets.strip
-  end
+  class << self
+    attr_accessor :city, :date
 
-  def self.get_date
-    date = ""
-    until valide_date?(date)
-      puts "Example: 2023-10-11"
-      print "Enter the date you are interested in:"
-      date = STDIN.gets.strip
-      valide_date?(date)
+    def set_city(city)
+      @city = city
     end
-    date
-  end
 
-  private
+    def set_date(value)
+      @date = valid_date_format?(value) ? value : nil
+    end
 
-  def self.valide_date?(date_str)
-    format_date = "%Y-%m-%d"
-    begin
-      Date.strptime(date_str, format_date)
-      return true
-    rescue ArgumentError
-      return false
+    private
+
+    def valid_date_format?(date_str)
+      format_date = "%Y-%m-%d"
+      begin
+        Date.strptime(date_str, format_date)
+        true
+      rescue ArgumentError
+        false
+      end
     end
   end
 end

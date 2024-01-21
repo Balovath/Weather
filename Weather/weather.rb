@@ -1,37 +1,54 @@
-require "net/http"
-require "uri"
-require "byebug"
-require "json"
-require "dotenv"
+require "bundler"
+Bundler.require
 require_relative "localization"
 Dotenv.load(".env")
 
 class Weather
+  BASE_URL = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/".freeze
   include Interface
 
+  attr_reader :hash_info
+
+  def initialize
+    @hash_info = {}
+  end
+
   def get_info
-    my_api = ENV["WHEATHER_KEY"]
+    weather_api_key = ENV["WHEATHER_KEY"]
     coordinate = Localization.get_coordinate
-    date = Interface.get_date
+    date = Interface.date
 
-    uri = URI.parse("https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/#{coordinate[:lat]},#{coordinate[:lon]}/#{date}?key=#{my_api}")
+    url = "#{BASE_URL}#{coordinate[:lat]},#{coordinate[:lon]}/#{date}?key=#{weather_api_key}"
+    uri = URI.parse(url)
 
-    response = Net::HTTP.get_response(uri)
-    if response.code == "200"
-      doc = JSON.parse(response.body).to_h
-      save_request(doc)
-      show_forecast(read_request)
-    else
-      puts "Error when executing a request to Weather"
-      nil
+    begin
+      response = Net::HTTP.get_response(uri)
+      if response.code == "200"
+        doc = JSON.parse(response.body).to_h
+        save_request(doc)
+        show_forecast(read_request)
+      else
+        puts "Error when executing a request to Weather#{response.code}"
+        read_request
+      end
+    rescue StandartError => e
+      puts "There's been an unknown error: #{e.message}"
+    rescue SocketError => e
+      puts "Connection error with Weather API server"
     end
   end
 
   private
 
   def save_request(doc)
-    File.open("wheather.json", "w") do |file|
-      file.write(JSON.dump(doc))
+    begin
+      File.open("wheather.json", "w") do |file|
+        file.write(JSON.dump(doc))
+      end
+    rescue IOError => e
+      puts "роизошла ошибка при сохранении файла: #{e.message}"
+    rescue StandartError => e
+      puts "Произошла неизвестная ошибка: #{e.message}"
     end
   end
 
@@ -40,20 +57,25 @@ class Weather
   end
 
   def read_request
-    file = File.read("wheather.json")
-    response = JSON.parse(file)
+    begin
+      file = File.read("wheather.json")
+      response = JSON.parse(file)
+    rescue IOError => e
+      puts "роизошла ошибка при сохранении файла: #{e.message}"
+    rescue StandartError => e
+      puts "Произошла неизвестная ошибка: #{e.message}"
+    end
   end
 
   def show_forecast(response)
-    tmax = response["days"][0]["tempmax"]
-    tmin = response["days"][0]["tempmin"]
+    tmax = celsius(response["days"][0]["tempmax"])
+    tmin = celsius(response["days"][0]["tempmin"])
+    hours = response["days"][0]["hours"].each do |hour|
+      hour["temp"] = celsius(hour["temp"])
+    end
 
-    puts "Date #{response["days"][0]["datetime"]}"
-    puts "Visibility #{response["days"][0]["visibility"]}"
-    puts "Max temp: #{celsius(tmax)}"
-    puts "Min temp: #{celsius(tmin)}"
+    @hash_info[:hours] = hours
+    @hash_info[:tmax] = tmax
+    @hash_info[:tmin] = tmin
   end
 end
-
-weather = Weather.new
-weather.get_info

@@ -1,19 +1,19 @@
+# frozen_string_literal: true
+
+require "dotenv"
+require "json"
 require "net/http"
 require "uri"
-require "json"
-require "dotenv"
 Dotenv.load(".env")
 
 class CityTranslator
-  GOOGLE_TRANSLATE_API = "https://google-translate1.p.rapidapi.com/language/translate/v2".freeze
+  GOOGLE_TRANSLATE_API = "https://google-translate1.p.rapidapi.com/language/translate/v2"
 
   def self.translate_city(city)
     return city unless contains_cyrillic?(city)
 
-    translated_city = translate_to_english(city)
+    translate_to_english(city)
   end
-
-  private
 
   def self.contains_cyrillic?(text)
     text =~ /[а-яА-Я]/
@@ -27,7 +27,6 @@ class CityTranslator
     translated_city = URI.encode_www_form_component(city)
     request = build_translation_request(translated_city)
     response = http.request(request)
-
     process_translation_response(response)
   end
 
@@ -45,6 +44,6 @@ class CityTranslator
   def self.process_translation_response(response)
     puts response.read_body
     doc = JSON.parse(response.body)
-    doc["data"]["translations"][0]["translatedText"]
+    @city = doc["data"]["translations"][0]["translatedText"]
   end
 end
