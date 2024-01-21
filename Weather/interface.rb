@@ -3,15 +3,15 @@ require "byebug"
 
 module Interface
   def self.get_city
-    print "В ведите название города:"
+    print "Enter the name of the city:"
     STDIN.gets.strip
   end
 
   def self.get_date
     date = ""
     until valide_date?(date)
-      puts "Привемер: 2023-10-11"
-      print "Введите дату которая вас интересует:"
+      puts "Example: 2023-10-11"
+      print "Enter the date you are interested in:"
       date = STDIN.gets.strip
       valide_date?(date)
     end
@@ -30,10 +30,3 @@ module Interface
     end
   end
 end
-
-# puts Interface.get_date
-
-# def check_date
-#   date = Date.parse(get_date)
-#   Date.strptime("#{date}", "%Y-%m-%d")
-# end

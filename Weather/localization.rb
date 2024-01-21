@@ -23,7 +23,7 @@ class Localization
       save_request(doc)
       coordinate = read_request
     else
-      puts "Ошибка при выполнении запроса к OpenWeatherMap"
+      puts "Error when executing a request to OpenWeatherMap"
       nil
     end
   end
@@ -47,6 +47,3 @@ class Localization
     { lat: "#{doc["lat"]}", lon: "#{doc["lon"]}" }
   end
 end
-
-# amwairment constant
-# modul

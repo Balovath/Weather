@@ -22,7 +22,7 @@ class Weather
       save_request(doc)
       show_forecast(read_request)
     else
-      puts "Ошибка при выполнении запроса к Weather"
+      puts "Error when executing a request to Weather"
       nil
     end
   end
@@ -48,12 +48,12 @@ class Weather
     tmax = response["days"][0]["tempmax"]
     tmin = response["days"][0]["tempmin"]
 
-    puts "Дата #{response["days"][0]["datetime"]}"
-    puts "Видимость #{response["days"][0]["visibility"]}"
+    puts "Date #{response["days"][0]["datetime"]}"
+    puts "Visibility #{response["days"][0]["visibility"]}"
     puts "Max temp: #{celsius(tmax)}"
     puts "Min temp: #{celsius(tmin)}"
   end
 end
 
-a = Weather.new
-a.get_info
+weather = Weather.new
+weather.get_info
