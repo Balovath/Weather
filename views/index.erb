@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Погодный Отчёт</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="weather-report">
+     <form action="/info" method="POST">
+       <input type="text" id="city" name="city" placeholder="Введите город"> 
+       <input type="date" name="date" min="2023-01-01" max="2024-12-31"> 
+        <input type="submit" value="Узнать погоду">
+     </form>
+   </div>
+  </div>
+</body>
+</html>
